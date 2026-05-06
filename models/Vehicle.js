@@ -1,7 +1,32 @@
 import mongoose from 'mongoose';
 
+const VariantSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  price: { type: Number, required: true },
+  tag: { type: String },
+  features: [{ type: String }]
+});
+
+const ColorSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  hex: { type: String, required: true },
+  price: { type: Number, default: 0 }
+});
+
+const InteriorColorSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  hex: { type: String, required: true }
+});
+
+const InventorySchema = new mongoose.Schema({
+  variant_name: { type: String, required: true },
+  exterior_color: { type: String, required: true },
+  stock_count: { type: Number, default: 0 }
+});
+
 const VehicleSchema = new mongoose.Schema({
   name: { type: String, required: true },
+  slug: { type: String, unique: true },
   model: { type: String, required: true },
   price: { type: Number, required: true },
   image: { type: String, required: true },
@@ -11,8 +36,18 @@ const VehicleSchema = new mongoose.Schema({
     mileage: String,
     fuel: String,
     transmission: String,
+    safety: String,
   },
   available: { type: Boolean, default: true },
+  
+  // Customization Options
+  variants: [VariantSchema],
+  exterior_colors: [ColorSchema],
+  interior_colors: [InteriorColorSchema],
+  
+  // Stock tracking for specific configurations
+  inventory: [InventorySchema],
+  
 }, { timestamps: true });
 
 export default mongoose.models.Vehicle || mongoose.model('Vehicle', VehicleSchema);

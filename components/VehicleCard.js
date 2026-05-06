@@ -3,10 +3,12 @@ import Link from 'next/link';
 const VehicleCard = ({ vehicle }) => {
   return (
     <div className="premium-card flex flex-col h-full overflow-hidden">
-      <div className="aspect-[16/10] overflow-hidden bg-gray-100">
+      <div className="aspect-[16/10] overflow-hidden bg-gray-100 relative">
         <img
           src={vehicle.image}
           alt={vehicle.name}
+          loading="lazy"
+          decoding="async"
           className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
         />
       </div>
@@ -29,7 +31,7 @@ const VehicleCard = ({ vehicle }) => {
 
         <div className="pt-2">
           <Link
-            href={`/vehicles/${vehicle._id}`}
+            href={`/vehicles/${vehicle.slug || vehicle._id}`}
             className="w-full btn-premium-primary text-sm"
           >
             Explore Vehicle

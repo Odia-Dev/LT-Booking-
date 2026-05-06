@@ -3,8 +3,8 @@ import dbConnect from '@/lib/db';
 import Booking from '@/models/Booking';
 
 export async function POST(req) {
-  await dbConnect();
   try {
+    await dbConnect();
     const body = await req.json();
     const booking = await Booking.create({
       vehicleId: body.vehicleId,
@@ -24,8 +24,8 @@ export async function POST(req) {
 }
 
 export async function GET() {
-  await dbConnect();
   try {
+    await dbConnect();
     const bookings = await Booking.find({}).populate('vehicleId');
     return NextResponse.json(bookings);
   } catch (error) {

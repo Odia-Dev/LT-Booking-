@@ -3,8 +3,8 @@ import dbConnect from '@/lib/db';
 import Vehicle from '@/models/Vehicle';
 
 export async function GET() {
-  await dbConnect();
   try {
+    await dbConnect();
     const vehicles = await Vehicle.find({});
     return NextResponse.json(vehicles);
   } catch (error) {
@@ -13,8 +13,8 @@ export async function GET() {
 }
 
 export async function POST(req) {
-  await dbConnect();
   try {
+    await dbConnect();
     const body = await req.json();
     const vehicle = await Vehicle.create(body);
     return NextResponse.json(vehicle, { status: 201 });

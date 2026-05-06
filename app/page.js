@@ -1,18 +1,52 @@
 import Link from 'next/link';
 import VehicleCard from '@/components/VehicleCard';
+import connectDB from '@/lib/db';
+import Vehicle from '@/models/Vehicle';
 
 async function getFeaturedVehicles() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-  const res = await fetch(`${baseUrl}/api/vehicles`, { cache: 'no-store' });
-  if (!res.ok) return [];
-  return res.json();
+  try {
+    await connectDB();
+    const vehicles = await Vehicle.find({ available: true }).lean();
+    return JSON.parse(JSON.stringify(vehicles));
+  } catch (error) {
+    console.error("Failed to fetch vehicles:", error);
+    return [];
+  }
 }
+
+export const metadata = {
+  title: 'Laxmi Toyota Odisha | Premium Toyota Showroom in Brahmapur, Jeypore & Rayagada',
+  description: 'Welcome to Laxmi Toyota, the leading authorized Toyota dealer in Odisha. Explore on-road prices, book test drives, and find the best offers on Fortuner, Hycross, and Hyryder.',
+};
 
 export default async function Home() {
   const vehicles = await getFeaturedVehicles();
 
+  const dealershipSchema = {
+    "@context": "https://schema.org",
+    "@type": "AutoDealer",
+    "name": "Laxmi Toyota Odisha",
+    "url": "https://laxmitoyota.com",
+    "logo": "https://laxmitoyota.com/favicon.ico",
+    "image": "https://laxmitoyota.com/hero.jpg",
+    "telephone": "+9118001234567",
+    "priceRange": "₹6,00,000 - ₹2,50,00,000",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Brahmapur",
+      "addressRegion": "Odisha",
+      "addressCountry": "IN"
+    },
+    "brand": "Toyota",
+    "areaServed": ["Brahmapur", "Jeypore", "Rayagada", "Bhawanipatna", "Bargarh", "Balangir"]
+  };
+
   return (
     <div className="flex flex-col">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(dealershipSchema) }}
+      />
       {/* 1. HERO SECTION */}
       <section className="bg-gradient-to-br from-[#0b0b0b] to-[#111827] section-hero relative overflow-hidden flex items-center min-h-[70vh]">
         <div className="absolute inset-0 opacity-20 z-0">

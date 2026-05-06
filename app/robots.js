@@ -1,0 +1,19 @@
+export default function robots() {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://laxmitoyota.com';
+  
+  return {
+    rules: [
+      {
+        userAgent: '*',
+        allow: '/',
+        disallow: [
+          '/admin',
+          '/api',
+          '/payment-failed',
+          '/thank-you'
+        ],
+      },
+    ],
+    sitemap: `${baseUrl}/sitemap.xml`,
+  };
+}
