@@ -1,48 +1,23 @@
 'use client';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState } from 'react';
-
-const megaMenuVehicles = {
-  Hatchback: [
-    { name: 'Glanza', price: 'Starts ₹6.86 Lakh', img: 'https://images.unsplash.com/photo-1542362567-b052da132171?auto=format&fit=crop&q=80&w=400', slug: 'toyota-glanza' },
-    { name: 'Taisor', price: 'Starts ₹7.73 Lakh', img: 'https://images.unsplash.com/photo-1542362567-b052da132171?auto=format&fit=crop&q=80&w=400', slug: 'toyota-urban-cruiser-taisor', isNew: true },
-  ],
-  SUV: [
-    { name: 'Hyryder', price: 'Starts ₹11.14 Lakh', img: 'https://images.unsplash.com/photo-1542362567-b052da132171?auto=format&fit=crop&q=80&w=400', slug: 'toyota-urban-cruiser-hyryder' },
-    { name: 'Innova Hycross', price: 'Starts ₹19.77 Lakh', img: 'https://images.unsplash.com/photo-1542362567-b052da132171?auto=format&fit=crop&q=80&w=400', slug: 'toyota-innova-hycross' },
-    { name: 'Fortuner', price: 'Starts ₹33.43 Lakh', img: 'https://images.unsplash.com/photo-1542362567-b052da132171?auto=format&fit=crop&q=80&w=400', slug: 'toyota-fortuner' },
-    { name: 'Legender', price: 'Starts ₹43.66 Lakh', img: 'https://images.unsplash.com/photo-1542362567-b052da132171?auto=format&fit=crop&q=80&w=400', slug: 'toyota-fortuner-legender' },
-    { name: 'Hilux', price: 'Starts ₹30.40 Lakh', img: 'https://images.unsplash.com/photo-1542362567-b052da132171?auto=format&fit=crop&q=80&w=400', slug: 'toyota-hilux' },
-  ],
-  MPV: [
-    { name: 'Rumion', price: 'Starts ₹10.44 Lakh', img: 'https://images.unsplash.com/photo-1542362567-b052da132171?auto=format&fit=crop&q=80&w=400', slug: 'toyota-rumion' },
-    { name: 'Innova Crysta', price: 'Starts ₹19.99 Lakh', img: 'https://images.unsplash.com/photo-1542362567-b052da132171?auto=format&fit=crop&q=80&w=400', slug: 'toyota-innova-crysta' },
-    { name: 'Vellfire', price: 'Starts ₹1.19 Crore', img: 'https://images.unsplash.com/photo-1542362567-b052da132171?auto=format&fit=crop&q=80&w=400', slug: 'toyota-vellfire' },
-  ],
-  "Sedan / Luxury": [
-    { name: 'Camry', price: 'Starts ₹46.17 Lakh', img: 'https://images.unsplash.com/photo-1542362567-b052da132171?auto=format&fit=crop&q=80&w=400', slug: 'toyota-camry' },
-    { name: 'Land Cruiser', price: 'Starts ₹2.10 Crore', img: 'https://images.unsplash.com/photo-1542362567-b052da132171?auto=format&fit=crop&q=80&w=400', slug: 'toyota-landcruiser300' },
-  ],
-  Hybrid: [
-    { name: 'Hyryder Hybrid', price: 'Starts ₹16.66 Lakh', img: 'https://images.unsplash.com/photo-1542362567-b052da132171?auto=format&fit=crop&q=80&w=400', slug: 'toyota-urban-cruiser-hyryder' },
-    { name: 'Hycross Hybrid', price: 'Starts ₹25.97 Lakh', img: 'https://images.unsplash.com/photo-1542362567-b052da132171?auto=format&fit=crop&q=80&w=400', slug: 'toyota-innova-hycross' },
-    { name: 'Camry Hybrid', price: 'Starts ₹46.17 Lakh', img: 'https://images.unsplash.com/photo-1542362567-b052da132171?auto=format&fit=crop&q=80&w=400', slug: 'toyota-camry' },
-  ]
-};
+import { useState, useEffect } from 'react';
 
 const VehicleImage = ({ src, alt, isNew, sizes = "100vw", className = "" }) => {
   const [error, setError] = useState(false);
   const placeholder = '/images/placeholder-vehicle.png';
 
+  // Phase 6: Premium Fallback System
+  const finalSrc = !src || error ? placeholder : src;
+
   return (
     <div className={`relative w-full aspect-[16/9] bg-[#f0f1f2] rounded-xl overflow-hidden shadow-inner ${className}`}>
       <Image 
-        src={error ? placeholder : src} 
+        src={finalSrc} 
         fill 
         sizes={sizes}
-        className={`transition-all duration-1000 ease-in-out ${error ? 'object-contain scale-75 opacity-40' : 'object-cover group-hover:scale-105'}`} 
-        alt={alt}
+        className={`transition-all duration-1000 ease-in-out ${finalSrc === placeholder ? 'object-contain scale-75 opacity-40' : 'object-cover group-hover:scale-105'}`} 
+        alt={alt || "Toyota Vehicle"}
         onError={() => setError(true)}
         loading="lazy"
       />
@@ -57,7 +32,41 @@ const VehicleImage = ({ src, alt, isNew, sizes = "100vw", className = "" }) => {
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
-  const [activeMobileCategory, setActiveMobileCategory] = useState('SUV');
+  const [activeMobileCategory, setActiveMobileCategory] = useState(null);
+  const [megaMenuVehicles, setMegaMenuVehicles] = useState({});
+
+  useEffect(() => {
+    const fetchVehicles = async () => {
+      try {
+        const res = await fetch('/api/vehicles');
+        if (!res.ok) throw new Error('Failed to fetch');
+        const data = await res.json();
+        
+        // Group by category dynamically (Phase 4 Goal)
+        const grouped = data.reduce((acc, v) => {
+          const cat = v.category || 'Other';
+          if (!acc[cat]) acc[cat] = [];
+          acc[cat].push({
+            name: v.name,
+            price: `Starts ₹${(v.price / 100000).toFixed(2)} Lakh`,
+            img: v.megaMenuImage || v.image, // Phase 4: Use megaMenuImage
+            slug: v.slug,
+            isNew: v.isNew
+          });
+          return acc;
+        }, {});
+        
+        setMegaMenuVehicles(grouped);
+        // Default first category for mobile
+        if (Object.keys(grouped).length > 0 && !activeMobileCategory) {
+          setActiveMobileCategory(Object.keys(grouped)[0]);
+        }
+      } catch (err) {
+        console.error("Mega Menu Fetch Error:", err);
+      }
+    };
+    fetchVehicles();
+  }, []);
 
   const navLinks = [
     { name: 'Offers', path: '/offers' },
@@ -68,9 +77,9 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="fixed w-full z-50 bg-white border-b border-gray-200 py-4 transition-all">
+    <nav className="fixed w-full z-50 bg-white border-b border-gray-200 py-3 sm:py-4 transition-all">
       <div className="main-container flex items-center justify-between">
-        <Link href="/" className="text-2xl font-extrabold text-[#ff2b2b] tracking-tight">
+        <Link href="/" className="text-lg sm:text-2xl font-extrabold text-[#ff2b2b] tracking-tighter shrink-0 whitespace-nowrap">
           Laxmi Toyota
         </Link>
         
@@ -98,17 +107,16 @@ const Navbar = () => {
           ))}
         </div>
 
-        <div className="flex items-center space-x-4">
-
-          <Link href="/book-online" className="btn-premium-primary !py-2.5 !text-sm !rounded-full">
+        <div className="flex items-center space-x-2 sm:space-x-4">
+          <Link href="/book-online" className="btn-premium-primary !py-1.5 !px-3 sm:!py-2.5 sm:!px-8 !text-[9px] sm:!text-sm !rounded-full shrink-0 whitespace-nowrap">
             Book Online
           </Link>
           <button 
             onClick={() => setIsOpen(!isOpen)} 
-            className="lg:hidden w-12 h-12 flex items-center justify-center text-gray-800 -mr-2"
+            className="lg:hidden w-10 h-10 flex items-center justify-center text-gray-800 -mr-1"
             aria-label="Toggle Menu"
           >
-            <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={isOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
             </svg>
           </button>

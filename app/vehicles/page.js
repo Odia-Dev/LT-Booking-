@@ -15,7 +15,7 @@ export default function VehiclesPage() {
   useEffect(() => {
     let result = vehicles;
     if (filters.category !== 'All') {
-      result = result.filter(v => v.model.includes(filters.category) || v.name.includes(filters.category));
+      result = result.filter(v => v.category === filters.category);
     }
     if (filters.fuel !== 'All') {
       result = result.filter(v => v.specs?.fuel === filters.fuel);
@@ -39,28 +39,30 @@ export default function VehiclesPage() {
   return (
     <div className="bg-[#f5f5f5] min-h-screen pb-24">
       {/* Hero / Header Section */}
-      <section className="bg-gradient-to-br from-[#0b0b0b] to-[#111827] section-hero relative overflow-hidden flex items-center min-h-[40vh]">
-        <div className="main-container relative z-10 w-full">
-           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 text-center md:text-left">
-              <div className="space-y-4">
-                <h1 className="text-white uppercase">Our <span className="text-[#ff2b2b]">Inventory</span></h1>
-                <p className="text-gray-400 text-sm uppercase tracking-[0.4em]">Premium Selection Ready for Delivery</p>
+      <section className="bg-gradient-to-br from-[#0b0b0b] to-[#111827] section-hero relative overflow-hidden flex items-center min-h-[30vh] sm:min-h-[40vh]">
+        <div className="main-container relative z-10 w-full py-8 sm:py-0">
+           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 sm:gap-8 text-center md:text-left">
+              <div className="space-y-3 sm:space-y-4">
+                <h1 className="text-white uppercase leading-tight">Our <span className="text-[#ff2b2b]">Inventory</span></h1>
+                <p className="text-gray-400 text-[10px] sm:text-sm uppercase tracking-[0.2em] sm:tracking-[0.4em]">Premium Selection Ready for Delivery</p>
               </div>
               
-              <div className="flex gap-4 justify-center">
-                <div className="bg-white/5 backdrop-blur-md p-1 px-4 rounded-lg border border-white/10">
+              <div className="flex flex-wrap gap-3 sm:gap-4 justify-center md:justify-end">
+                <div className="bg-white/5 backdrop-blur-md p-1 px-3 sm:px-4 rounded-lg border border-white/10 shrink-0">
                   <select 
-                    className="bg-transparent py-3 text-xs font-black uppercase tracking-widest outline-none text-white transition-all cursor-pointer"
+                    className="bg-transparent py-2 sm:py-3 text-[10px] sm:text-xs font-black uppercase tracking-widest outline-none text-white transition-all cursor-pointer appearance-none"
                     onChange={(e) => setFilters({ ...filters, category: e.target.value })}
                   >
                     <option value="All" className="text-black">All Categories</option>
                     <option value="SUV" className="text-black">SUV</option>
                     <option value="Sedan" className="text-black">Sedan</option>
+                    <option value="Luxury" className="text-black">Luxury</option>
+                    <option value="Hybrid" className="text-black">Hybrid</option>
                   </select>
                 </div>
-                <div className="bg-white/5 backdrop-blur-md p-1 px-4 rounded-lg border border-white/10">
+                <div className="bg-white/5 backdrop-blur-md p-1 px-3 sm:px-4 rounded-lg border border-white/10 shrink-0">
                   <select 
-                    className="bg-transparent py-3 text-xs font-black uppercase tracking-widest outline-none text-white transition-all cursor-pointer"
+                    className="bg-transparent py-2 sm:py-3 text-[10px] sm:text-xs font-black uppercase tracking-widest outline-none text-white transition-all cursor-pointer appearance-none"
                     onChange={(e) => setFilters({ ...filters, fuel: e.target.value })}
                   >
                     <option value="All" className="text-black">All Fuel Types</option>

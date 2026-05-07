@@ -8,28 +8,39 @@ import { trackEvent } from '@/utils/analytics';
 export default function VehicleConfigurator({ vehicle, variants, colors, interiorColors }) {
   const router = useRouter();
   
-  // Configurator State
-  const [selectedColor, setSelectedColor] = useState(colors[0]);
-  const [selectedVariant, setSelectedVariant] = useState(variants[1]); // Default to VX AT
-  const [selectedInterior, setSelectedInterior] = useState(interiorColors[0]);
+  // Configurator State - Phase 4 Dynamic Initialization
+  const [selectedColor, setSelectedColor] = useState(colors?.[0] || null);
+  const [selectedVariant, setSelectedVariant] = useState(variants?.[0] || null);
+  const [selectedInterior, setSelectedInterior] = useState(interiorColors?.[0] || null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [stockCount, setStockCount] = useState(5);
 
   useEffect(() => {
     if (selectedVariant && selectedColor) {
-      // Mock CRM Stock Fetch based on config
-      const hash = selectedVariant.name.length + selectedColor.name.length;
-      if (hash % 4 === 0) setStockCount(0); // Out of stock
-      else if (hash % 3 === 0) setStockCount(2); // Limited stock
-      else setStockCount(12); // Available
+      // Phase 11: Real-time Stock Synchronization
+      // In production, this would be a dynamic check against vehicle.inventory
+      const config = vehicle.inventory?.find(i => 
+        i.variant_name === selectedVariant.name && 
+        i.exterior_color === selectedColor.name
+      );
+      
+      if (config) {
+        setStockCount(config.stock_count);
+      } else {
+        // Fallback for demo if no specific inventory record exists
+        const hash = selectedVariant.name.length + selectedColor.name.length;
+        setStockCount(hash % 4 === 0 ? 0 : (hash % 3 === 0 ? 2 : 12));
+      }
     }
-  }, [selectedVariant, selectedColor]);
+  }, [selectedVariant, selectedColor, vehicle.inventory]);
 
-  const gallery = [
-    vehicle.image,
-    'https://images.unsplash.com/photo-1590362891991-f776e747a588?auto=format&fit=crop&q=80&w=1440',
-    'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&q=80&w=1440'
-  ];
+  // Phase 7, 8, 9: Advanced Image Mapping
+  const gallery = (() => {
+    if (selectedColor?.images?.length > 0) return selectedColor.images;
+    if (selectedVariant?.images?.length > 0) return selectedVariant.images;
+    if (vehicle.galleryImages?.length > 0) return vehicle.galleryImages;
+    return [vehicle.heroImage || vehicle.image];
+  })();
 
   const bookingAmount = 50000;
   const exShowroom = vehicle.price + (selectedVariant?.price || 0) + (selectedColor?.price || 0);
@@ -40,22 +51,22 @@ export default function VehicleConfigurator({ vehicle, variants, colors, interio
     const params = new URLSearchParams({
       vehicleId: vehicle.slug || vehicle._id,
       vehicleName: vehicle.name,
-      variant: selectedVariant.name,
-      color: selectedColor.name,
-      interior: selectedInterior.name,
+      variant: selectedVariant?.name || '',
+      color: selectedColor?.name || '',
+      interior: selectedInterior?.name || '',
       amount: bookingAmount
     });
     router.push(`/book-online?${params.toString()}`);
   };
 
   return (
-    <main className="max-w-[1600px] mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-12 gap-12 pb-32">
+    <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 pb-32">
       
       {/* LEFT: Visual Showcase (Fixed on Desktop) */}
       <div className="lg:col-span-8 space-y-8">
         <div className="lg:sticky lg:top-28">
           {/* Main Image */}
-          <div className="relative aspect-[16/9] bg-[#F8F8F8] rounded-3xl overflow-hidden group">
+          <div className="relative aspect-[4/3] sm:aspect-[16/9] bg-[#F8F8F8] rounded-2xl sm:rounded-3xl overflow-hidden group">
             <Image 
               src={gallery[activeImageIndex] || '/placeholder.png'} 
               fill
@@ -63,35 +74,25 @@ export default function VehicleConfigurator({ vehicle, variants, colors, interio
               alt={vehicle.name}
               priority 
             />
-            <div className="absolute top-8 left-8 flex flex-col gap-2">
-              <span className="bg-white/90 backdrop-blur px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border border-gray-100 shadow-sm w-fit">
+            <div className="absolute top-4 left-4 sm:top-8 sm:left-8 flex flex-col gap-2">
+              <span className="bg-white/90 backdrop-blur px-3 py-1 sm:px-4 sm:py-1.5 rounded-full text-[8px] sm:text-[10px] font-bold uppercase tracking-widest border border-gray-100 shadow-sm w-fit">
                 {stockCount > 0 ? 'Ready for delivery' : 'Waitlist Open'}
               </span>
               {stockCount > 0 && stockCount <= 3 && (
-                <span className="bg-[#ff2b2b] text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg shadow-red-100 animate-pulse w-fit">
-                  Limited Stock: Only {stockCount} Left
-                </span>
-              )}
-              {stockCount > 3 && (
-                <span className="bg-green-600 text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg shadow-green-100 w-fit">
-                  Available: Fast Delivery
-                </span>
-              )}
-              {stockCount === 0 && (
-                <span className="bg-gray-900 text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest w-fit">
-                  Expected Delivery: 6-8 Weeks
+                <span className="bg-[#ff2b2b] text-white px-3 py-1 sm:px-4 sm:py-1.5 rounded-full text-[8px] sm:text-[10px] font-black uppercase tracking-widest shadow-lg shadow-red-100 animate-pulse w-fit">
+                  Limited Stock
                 </span>
               )}
             </div>
           </div>
 
           {/* Thumbnail Gallery */}
-          <div className="flex gap-4 mt-6">
+          <div className="flex gap-3 sm:gap-4 mt-4 sm:mt-6 overflow-x-auto pb-2 custom-scrollbar">
             {gallery.map((img, idx) => (
               <button 
                 key={idx}
                 onClick={() => setActiveImageIndex(idx)}
-                className={`relative w-24 aspect-video rounded-xl overflow-hidden border-2 transition-all ${activeImageIndex === idx ? 'border-[#ff2b2b] scale-105 shadow-lg' : 'border-transparent opacity-60 hover:opacity-100'}`}
+                className={`relative w-20 sm:w-24 aspect-video rounded-lg sm:rounded-xl overflow-hidden border-2 transition-all shrink-0 ${activeImageIndex === idx ? 'border-[#ff2b2b] scale-105 shadow-lg' : 'border-transparent opacity-60 hover:opacity-100'}`}
               >
                 <Image src={img || '/placeholder.png'} fill className="object-cover" alt="Thumbnail" />
               </button>
@@ -99,18 +100,18 @@ export default function VehicleConfigurator({ vehicle, variants, colors, interio
           </div>
 
           {/* Premium Specs Grid */}
-          <div className="grid grid-cols-3 gap-8 pt-16 pb-8 border-b border-gray-100">
+          <div className="grid grid-cols-3 gap-4 sm:gap-8 pt-10 sm:pt-16 pb-6 sm:pb-8 border-b border-gray-100">
             <div className="space-y-1">
-              <p className="text-3xl font-bold tracking-tight">{vehicle.specs?.mileage || '18.2'}<span className="text-sm font-normal ml-1">km/l</span></p>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Efficiency</p>
+              <p className="text-xl sm:text-3xl font-bold tracking-tight">{vehicle.specs?.mileage || '18.2'}<span className="text-[10px] sm:text-sm font-normal ml-0.5 sm:ml-1">km/l</span></p>
+              <p className="text-[8px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-widest">Efficiency</p>
             </div>
             <div className="space-y-1">
-              <p className="text-3xl font-bold tracking-tight">{vehicle.specs?.engine || '2.0L'}</p>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Powertrain</p>
+              <p className="text-xl sm:text-3xl font-bold tracking-tight">{vehicle.specs?.engine || '2.0L'}</p>
+              <p className="text-[8px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-widest">Powertrain</p>
             </div>
             <div className="space-y-1">
-              <p className="text-3xl font-bold tracking-tight">5★</p>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">GNCAP Safety</p>
+              <p className="text-xl sm:text-3xl font-bold tracking-tight">5★</p>
+              <p className="text-[8px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-widest">Safety</p>
             </div>
           </div>
         </div>
@@ -119,8 +120,8 @@ export default function VehicleConfigurator({ vehicle, variants, colors, interio
       {/* RIGHT: Configurator Panel */}
       <div className="lg:col-span-4 space-y-12 animate-in fade-in slide-in-from-right-4 duration-1000">
         <header className="space-y-2">
-          <h1 className="text-4xl lg:text-6xl font-extrabold tracking-tight uppercase italic">{vehicle.name}</h1>
-          <p className="text-gray-500 font-medium">Configure your premium driving experience.</p>
+          <h1 className="text-3xl sm:text-4xl lg:text-6xl font-extrabold tracking-tight uppercase italic leading-tight">{vehicle.name}</h1>
+          <p className="text-sm sm:text-base text-gray-500 font-medium">Configure your premium driving experience.</p>
         </header>
 
         {/* Variant Selector */}
@@ -283,21 +284,21 @@ export default function VehicleConfigurator({ vehicle, variants, colors, interio
       </div>
 
       {/* STICKY FOOTER - Mobile & Desktop Floating */}
-      <div className="fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-xl border-t border-gray-100 p-6 z-50">
+      <div className="fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-xl border-t border-gray-100 p-4 sm:p-6 z-50">
         <div className="max-w-[1440px] mx-auto flex items-center justify-between">
-          <div className="hidden sm:block">
+          <div className="hidden md:block">
             <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Configuration Summary</p>
             <p className="font-bold text-sm">{vehicle.name} {selectedVariant?.name} / {selectedColor?.name}</p>
           </div>
-          <div className="flex items-center gap-8 w-full sm:w-auto">
+          <div className="flex items-center gap-6 sm:gap-8 w-full md:w-auto">
              <div className="flex flex-col">
-               <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Total Estimated</span>
-               <span className="text-xl font-black italic">₹{(exShowroom / 100000).toFixed(2)}L</span>
+               <span className="text-[8px] sm:text-[9px] font-bold text-gray-400 uppercase tracking-widest">Total Estimated</span>
+               <span className="text-lg sm:text-xl font-black italic">₹{(exShowroom / 100000).toFixed(2)}L</span>
              </div>
              <button 
                onClick={stockCount > 0 ? handleBookNow : null}
                disabled={stockCount === 0}
-               className={`flex-1 sm:flex-none px-12 py-4 text-white font-bold rounded-xl uppercase tracking-widest text-xs transition-all ${
+               className={`flex-1 md:flex-none px-8 sm:px-12 py-3.5 sm:py-4 text-white font-bold rounded-xl uppercase tracking-widest text-[10px] sm:text-xs transition-all ${
                  stockCount > 0 ? 'bg-[#ff2b2b] hover:bg-black' : 'bg-gray-300 cursor-not-allowed'
                }`}
              >
