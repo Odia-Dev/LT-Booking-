@@ -232,35 +232,42 @@ const BookingForm = ({ vehicleId, vehicleName, variant, color, interior, amount,
             </div>
           </div>
 
-          {/* OTP Flow for Phone Number */}
-          <div className="p-5 border border-gray-100 bg-gray-50 rounded-3xl space-y-4">
+          {/* OTP Flow for Phone Number - Fixed Overlap & Premium Structure */}
+          <div className="p-6 border border-gray-100 bg-gray-50/50 rounded-3xl space-y-4">
              <label className={labelClass}>Phone Number <span className="text-[#ff2b2b]">*</span></label>
              <div className="flex flex-col sm:flex-row gap-3">
-               <div className="relative flex-1">
-                 <span className="absolute left-6 top-4 font-bold text-gray-400">+91</span>
+               <div className={`flex flex-1 items-stretch bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm transition-all focus-within:border-[#ff2b2b] focus-within:ring-1 focus-within:ring-[#ff2b2b] ${otpVerified ? 'bg-green-50 border-green-200 ring-0' : ''}`}>
+                 <div className="flex items-center justify-center bg-gray-50 border-r border-gray-100 px-5 select-none">
+                   <span className="text-sm font-bold text-gray-500">+91</span>
+                 </div>
                  <input
                    required
                    type="tel"
-                   placeholder="00000 00000"
-                   className={`${inputClass} pl-16 ${otpVerified ? 'bg-green-50 border-green-200 text-green-900 pointer-events-none' : ''}`}
+                   inputMode="numeric"
+                   autoComplete="tel"
+                   placeholder="Enter mobile number"
+                   className="w-full py-4 px-5 bg-transparent text-gray-900 outline-none placeholder:text-gray-300 font-medium disabled:text-green-800 disabled:opacity-80"
                    value={formData.phone}
                    onChange={handlePhoneChange}
                    disabled={otpVerified}
                  />
                </div>
+               
                {!otpVerified && !otpSent && (
                  <button 
                    type="button" 
                    onClick={handleSendOTP} 
                    disabled={formData.phone.length !== 10 || phoneError || otpLoading}
-                   className="px-8 py-4 bg-gray-900 text-white font-bold rounded-2xl text-xs uppercase tracking-widest disabled:opacity-50 min-w-[140px]"
+                   className="px-8 py-4 bg-gray-900 text-white font-bold rounded-2xl text-xs uppercase tracking-widest disabled:opacity-50 min-w-[140px] hover:bg-black transition-colors"
                  >
                    {otpLoading ? 'Sending...' : 'Send OTP'}
                  </button>
                )}
+               
                {otpVerified && (
-                  <div className="px-8 py-4 bg-green-100 text-green-700 font-bold rounded-2xl flex items-center justify-center gap-2">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg> Verified
+                  <div className="px-8 py-4 bg-green-100 text-green-700 font-bold rounded-2xl flex items-center justify-center gap-2 min-w-[140px] animate-in zoom-in-95 duration-300">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
+                    <span className="text-xs uppercase tracking-widest">Verified</span>
                   </div>
                )}
              </div>
