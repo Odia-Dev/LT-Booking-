@@ -1,4 +1,9 @@
 'use client';
+/**
+ * Update: Resolved build failure by ensuring Client Component directive.
+ * Date: 2026-05-07
+ * Timestamp: 14:26 IST
+ */
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 
