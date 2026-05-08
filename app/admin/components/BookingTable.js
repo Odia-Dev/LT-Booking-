@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from 'react';
 import StatusBadge from './StatusBadge';
 import Skeleton from './Skeleton';

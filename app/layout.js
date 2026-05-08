@@ -56,7 +56,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={inter.className}>
-      <body>
+      <body suppressHydrationWarning={true}>
         {/* Google Analytics 4 */}
         {GA_ID && (
           <>
@@ -90,11 +90,7 @@ export default function RootLayout({ children }) {
           </Script>
         )}
 
-        <Navbar />
-        <main className="min-h-screen pt-[88px]">
-          {children}
-        </main>
-        <Footer />
+        {children}
         <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="beforeInteractive" />
       </body>
     </html>

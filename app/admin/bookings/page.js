@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import { useState, useEffect } from 'react';
 import BookingTable from '../components/BookingTable';
 import BookingDrawer from '../components/BookingDrawer';

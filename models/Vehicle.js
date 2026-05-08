@@ -51,6 +51,8 @@ const VehicleSchema = new mongoose.Schema({
   },
   
   available: { type: Boolean, default: true },
+  bookingAmount: { type: Number, default: 50000 },
+  deliveryTimeline: { type: String, default: '4-6 Weeks' },
   offers: [{ type: String }],
   
   // Customization Options

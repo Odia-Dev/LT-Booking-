@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import Skeleton from './Skeleton';
 
 const CustomerTable = ({ customers, loading }) => {

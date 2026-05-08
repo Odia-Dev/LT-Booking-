@@ -1,13 +1,17 @@
 import { NextResponse } from 'next/server';
 import cloudinary from '@/lib/cloudinary';
+import { getSession } from '@/lib/auth';
 
-export async function POST(req) {
+export async function POST(request) {
   try {
-    const formData = await req.formData();
+    const session = await getSession();
+    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    const formData = await request.formData();
     const file = formData.get('file');
 
     if (!file) {
-      return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
+      return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 
     const bytes = await file.arrayBuffer();
@@ -15,22 +19,18 @@ export async function POST(req) {
 
     // Upload to Cloudinary
     const result = await new Promise((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
+      cloudinary.uploader.upload_stream(
         { folder: 'toyota-inventory' },
         (error, result) => {
           if (error) reject(error);
           else resolve(result);
         }
-      );
-      uploadStream.end(buffer);
+      ).end(buffer);
     });
 
-    return NextResponse.json({ 
-      url: result.secure_url,
-      public_id: result.public_id 
-    });
-  } catch (error) {
-    console.error('Upload Error:', error);
+    return NextResponse.json({ url: result.secure_url });
+  } catch (err) {
+    console.error('Upload error:', err);
     return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
   }
 }
