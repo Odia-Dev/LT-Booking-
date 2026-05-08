@@ -72,6 +72,33 @@ const bookingSchema = new mongoose.Schema({
     date: { type: Date, default: Date.now }
   }],
 
+  // POST-BOOKING ONBOARDING DATA (PHASE 5)
+  finance_docs_submitted: { type: Boolean, default: false },
+  exchange_details_submitted: { type: Boolean, default: false },
+  showroom_visit_requested: { type: Boolean, default: false },
+  showroom_branch: { type: String },
+  showroom_date: { type: Date },
+  showroom_time: { type: String },
+
+  // DETAILED ONBOARDING DATA
+  finance_details: {
+    aadhaar_number: { type: String },
+    pan_number: { type: String },
+    employment_type: { type: String },
+    monthly_income: { type: Number },
+    company_name: { type: String },
+    bank_name: { type: String }
+  },
+  exchange_details: {
+    brand: { type: String },
+    model: { type: String },
+    reg_year: { type: Number },
+    km_driven: { type: Number },
+    fuel_type: { type: String },
+    accident_history: { type: String }
+  },
+  showroom_visit_notes: { type: String },
+
 }, { timestamps: true });
 
 export default mongoose.models.Booking || mongoose.model("Booking", bookingSchema);

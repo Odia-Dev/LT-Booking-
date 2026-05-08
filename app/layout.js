@@ -46,11 +46,16 @@ export const metadata = {
     description: 'Discover the latest Toyota models and premium service at Laxmi Toyota.',
     images: ['https://images.unsplash.com/photo-1542362567-b052da132171?auto=format&fit=crop&q=80&w=1200'],
   },
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
   robots: {
     index: true,
     follow: true,
   }
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({ children }) {

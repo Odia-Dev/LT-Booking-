@@ -114,6 +114,92 @@ const BookingDrawer = ({ booking, isOpen, onClose, onUpdate }) => {
             </div>
           </section>
 
+          {/* SECTION 7 - ONBOARDING DETAILS */}
+          <section className="space-y-4">
+            <h3 className="text-[10px] font-bold text-gray-900 uppercase tracking-[0.2em] border-l-2 border-blue-600 pl-3">7. Onboarding Status</h3>
+            <div className="grid grid-cols-1 gap-4">
+               {/* Finance Application */}
+               <div className={`p-6 border rounded-2xl space-y-4 ${booking?.finance_docs_submitted ? 'bg-blue-50/50 border-blue-100' : 'bg-white border-gray-100'}`}>
+                  <div className="flex justify-between items-center">
+                     <p className="text-[10px] font-black text-gray-900 uppercase italic">Finance Application</p>
+                     <span className={`px-3 py-1 rounded-full text-[8px] font-bold uppercase tracking-widest ${booking?.finance_docs_submitted ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-400'}`}>
+                        {booking?.finance_docs_submitted ? 'Docs Submitted' : booking?.finance_required ? 'Interested' : 'No Interest'}
+                     </span>
+                  </div>
+                  {booking?.finance_docs_submitted && (
+                     <div className="grid grid-cols-2 gap-3 pt-2 border-t border-blue-100/50">
+                        <div>
+                           <p className="text-[8px] text-gray-400 uppercase font-bold">Aadhaar</p>
+                           <p className="text-[10px] font-bold text-gray-900">{booking?.finance_details?.aadhaar_number}</p>
+                        </div>
+                        <div>
+                           <p className="text-[8px] text-gray-400 uppercase font-bold">PAN</p>
+                           <p className="text-[10px] font-bold text-gray-900 uppercase">{booking?.finance_details?.pan_number}</p>
+                        </div>
+                        <div>
+                           <p className="text-[8px] text-gray-400 uppercase font-bold">Income</p>
+                           <p className="text-[10px] font-bold text-gray-900">₹{booking?.finance_details?.monthly_income?.toLocaleString()}/mo</p>
+                        </div>
+                        <div>
+                           <p className="text-[8px] text-gray-400 uppercase font-bold">Employment</p>
+                           <p className="text-[10px] font-bold text-gray-900">{booking?.finance_details?.employment_type}</p>
+                        </div>
+                     </div>
+                  )}
+               </div>
+
+               {/* Exchange Evaluation */}
+               <div className={`p-6 border rounded-2xl space-y-4 ${booking?.exchange_details_submitted ? 'bg-orange-50/50 border-orange-100' : 'bg-white border-gray-100'}`}>
+                  <div className="flex justify-between items-center">
+                     <p className="text-[10px] font-black text-gray-900 uppercase italic">Exchange Appraisal</p>
+                     <span className={`px-3 py-1 rounded-full text-[8px] font-bold uppercase tracking-widest ${booking?.exchange_details_submitted ? 'bg-orange-600 text-white' : 'bg-gray-100 text-gray-400'}`}>
+                        {booking?.exchange_details_submitted ? 'Details Submitted' : booking?.exchange_required ? 'Interested' : 'No Interest'}
+                     </span>
+                  </div>
+                  {booking?.exchange_details_submitted && (
+                     <div className="grid grid-cols-2 gap-3 pt-2 border-t border-orange-100/50">
+                        <div className="col-span-2">
+                           <p className="text-[8px] text-gray-400 uppercase font-bold">Vehicle</p>
+                           <p className="text-[10px] font-bold text-gray-900 uppercase">{booking?.exchange_details?.brand} {booking?.exchange_details?.model} ({booking?.exchange_details?.reg_year})</p>
+                        </div>
+                        <div>
+                           <p className="text-[8px] text-gray-400 uppercase font-bold">KM Driven</p>
+                           <p className="text-[10px] font-bold text-gray-900">{booking?.exchange_details?.km_driven?.toLocaleString()} KM</p>
+                        </div>
+                        <div>
+                           <p className="text-[8px] text-gray-400 uppercase font-bold">Accident History</p>
+                           <p className="text-[10px] font-bold text-gray-900 uppercase">{booking?.exchange_details?.accident_history}</p>
+                        </div>
+                     </div>
+                  )}
+               </div>
+
+               {/* Showroom Visit */}
+               {booking?.showroom_visit_requested && (
+                  <div className="p-6 border border-red-100 bg-red-50/30 rounded-2xl space-y-4">
+                     <div className="flex justify-between items-center">
+                        <p className="text-[10px] font-black text-[#E60023] uppercase italic">Showroom Visit Scheduled</p>
+                        <span className="bg-[#E60023] text-white px-3 py-1 rounded-full text-[8px] font-bold uppercase tracking-widest">Scheduled</span>
+                     </div>
+                     <div className="grid grid-cols-2 gap-3 pt-2 border-t border-red-100">
+                        <div>
+                           <p className="text-[8px] text-gray-400 uppercase font-bold">Branch</p>
+                           <p className="text-[10px] font-bold text-gray-900 uppercase">{booking?.showroom_branch}</p>
+                        </div>
+                        <div>
+                           <p className="text-[8px] text-gray-400 uppercase font-bold">Date & Time</p>
+                           <p className="text-[10px] font-bold text-gray-900">{booking?.showroom_date ? new Date(booking.showroom_date).toLocaleDateString() : 'N/A'} @ {booking?.showroom_time}</p>
+                        </div>
+                        <div className="col-span-2">
+                           <p className="text-[8px] text-gray-400 uppercase font-bold">Consultation Notes</p>
+                           <p className="text-[10px] font-medium text-gray-600">{booking?.showroom_visit_notes || 'No notes provided'}</p>
+                        </div>
+                     </div>
+                  </div>
+               )}
+            </div>
+          </section>
+
           {/* SECTION 6 - LEAD MANAGEMENT */}
           <section className="space-y-4">
             <h3 className="text-[10px] font-bold text-gray-900 uppercase tracking-[0.2em] border-l-2 border-[#ff2b2b] pl-3">6. Lead Management</h3>
